@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rivals Counter-Picker – Counterpicks aus deinem Tab-Screenshot</title>
+<meta name="description" content="Windows-App für Marvel Rivals: Tab + F12 im Match, und der Counter-Picker erkennt beide Teams, zeigt Counterpicks, Team-Ups, Map-Vorteile und dein Matchup.">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #0b0e14; --panel: #141923; --panel2: #1b2130; --line: #283041;
+  --fg: #e8ebf2; --muted: #9aa3b5; --gold: #e8b64a; --red: #f0575a; --blue: #4f8ff7; --green: #3fc98a;
+  --fd: "Chakra Petch", "Arial Narrow", system-ui, sans-serif; --fb: "Inter", system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 var(--fb); }
+a { color: var(--gold); }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 0; }
+.logo { display: flex; align-items: center; gap: 10px; font: 700 18px var(--fd); color: var(--fg); text-decoration: none; letter-spacing: .3px; }
+.logo img { width: 30px; height: 30px; }
+nav .links { display: flex; gap: 18px; font-size: 14px; }
+nav .links a { color: var(--muted); text-decoration: none; } nav .links a:hover { color: var(--fg); }
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 40px; align-items: center; padding: 40px 0 56px; }
+h1 { font: 700 clamp(34px, 5vw, 54px)/1.05 var(--fd); margin: 0 0 16px; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--gold); }
+.lead { color: var(--muted); font-size: 18px; margin: 0 0 26px; max-width: 34em; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 10px; font: 700 16px var(--fb); background: var(--gold); color: #1a1406; border-radius: 10px; padding: 13px 22px; text-decoration: none; border: 0; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: var(--panel2); color: var(--fg); border: 1px solid var(--line); }
+.small { font-size: 13px; color: var(--muted); }
+.shot { border-radius: 14px; border: 1px solid var(--line); box-shadow: 0 30px 80px -20px #000c, 0 0 0 1px #ffffff08; width: 100%; height: auto; display: block; }
+section { padding: 56px 0; border-top: 1px solid var(--line); }
+h2 { font: 700 30px var(--fd); margin: 0 0 8px; }
+.sub { color: var(--muted); margin: 0 0 30px; }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: s; }
+.step { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+.step .n { font: 700 13px var(--fb); color: var(--gold); letter-spacing: 1px; text-transform: uppercase; }
+.step h3 { margin: 6px 0 8px; font-size: 18px; }
+.step p { margin: 0; color: var(--muted); font-size: 15px; }
+kbd { font: 700 14px var(--fb); color: var(--fg); background: linear-gradient(#2a3244, #1d2331); border: 1px solid #3a4459; border-bottom-width: 3px; border-radius: 7px; padding: 3px 10px; }
+.feat { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.f { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 16px; border-top: 3px solid var(--c, var(--gold)); }
+.f h3 { margin: 0 0 6px; font-size: 16px; }
+.f p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.faq details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; }
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq p { color: var(--muted); margin: 10px 0 2px; }
+.dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: center; background: linear-gradient(135deg, #1d1a10, var(--panel)); border: 1px solid #4a3d1c; border-radius: 16px; padding: 26px; }
+.dl h2 { margin: 0 0 6px; }
+.dl ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 14.5px; }
+footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 13px; }
+footer .row { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: space-between; }
+footer a { color: var(--muted); }
+@media (max-width: 860px) {
+  .hero { grid-template-columns: minmax(0, 1fr); padding-top: 16px; }
+  .steps, .feat { grid-template-columns: minmax(0, 1fr); }
+  .dl { grid-template-columns: minmax(0, 1fr); }
+  nav .links { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="logo" href="#"><img src="icon.png" alt="">Rivals Counter-Picker</a>
+    <div class="links"><a href="#so-gehts">So geht's</a><a href="#features">Features</a><a href="#faq">FAQ</a><a href="#download">Download</a></div>
+  </nav>
+
+  <div class="hero">
+    <div>
+      <h1>Wissen, was du <em>picken</em> solltest. In einer Sekunde.</h1>
+      <p class="lead">Drück im Match <kbd>Tab</kbd> + <kbd>F12</kbd>. Der Counter-Picker liest beide Teams aus deinem Steam-Screenshot und zeigt dir Counterpicks, Team-Ups mit deinen Mates und Map-Vorteile.</p>
+      <div class="cta">
+        <a class="btn" id="dlbtn" href="#download">⬇ Für Windows herunterladen</a>
+        <span class="small">Kostenlos · Windows 10/11 · greift nicht ins Spiel ein</span>
+      </div>
+    </div>
+    <img class="shot" src="screenshot.jpg" width="2440" height="1520" alt="Rivals Counter-Picker: erkanntes Gegnerteam und eigenes Team mit Counter-Vorschlägen">
+  </div>
+</div>
+
+<section id="so-gehts"><div class="wrap">
+  <h2>So geht's</h2>
+  <p class="sub">Drei Schritte, kein Alt-Tab, kein Abtippen.</p>
+  <div class="steps">
+    <div class="step"><div class="n">Schritt 1</div><h3>App starten</h3><p>Installieren und öffnen. Den Steam-Screenshot-Ordner von Marvel Rivals findet die App selbst.</p></div>
+    <div class="step"><div class="n">Schritt 2</div><h3><kbd>Tab</kbd> + <kbd>F12</kbd> im Match</h3><p>Tab-Übersicht offen halten und den normalen Steam-Screenshot machen. Der Rest passiert automatisch.</p></div>
+    <div class="step"><div class="n">Schritt 3</div><h3>Pick ablesen</h3><p>Beide Teams werden erkannt, dein Held ist markiert, die besten Counterpicks stehen oben – deine Favoriten zuerst.</p></div>
+  </div>
+</div></section>
+
+<section id="features"><div class="wrap">
+  <h2>Features</h2>
+  <p class="sub">Gebaut für Spieler, die schnell entscheiden wollen.</p>
+  <div class="feat">
+    <div class="f" style="--c:var(--red)"><h3>Gegner- und Teamerkennung</h3><p>Liest alle 12 Helden aus der Tab-Übersicht. Unsichere Treffer markiert die App orange, mit Auswahl zum Korrigieren.</p></div>
+    <div class="f" style="--c:var(--gold)"><h3>Counterpicks mit Score</h3><p>Counter-Werte, Schwierigkeit und Meta-Tier zu einem Score verrechnet. Deine Favoriten stehen ganz oben.</p></div>
+    <div class="f" style="--c:var(--blue)"><h3>Team-Ups mit deinen Mates</h3><p>Alle Team-Ups der Season mit Tier. Picks, die mit deinem Team ein Team-Up haben, steigen im Ranking.</p></div>
+    <div class="f" style="--c:var(--green)"><h3>Map-Vorteile</h3><p>Viel Höhe, lange Sichtlinien, enge Gänge? Helden, die zur Map passen, bekommen einen Bonus.</p></div>
+    <div class="f" style="--c:#b48cff"><h3>Dein Held im Blick</h3><p>Matchup gegen das Gegnerteam, Fokus-Ziele, Kombos und Fähigkeiten auf einen Blick.</p></div>
+    <div class="f" style="--c:#7bd88f"><h3>Lernt mit</h3><p>Jede Korrektur merkt sich die App. Neue Skins sind nach einmal Korrigieren bekannt – komplett offline.</p></div>
+  </div>
+</div></section>
+
+<section id="faq" class="faq"><div class="wrap">
+  <h2>FAQ</h2>
+  <p class="sub">Was du vor dem Download wissen solltest.</p>
+  <details><summary>Ist das erlaubt? Riskiere ich einen Bann?</summary><p>Die App liest nur die Screenshots, die Steam ohnehin speichert. Sie greift nicht in den Spielprozess ein, liest keinen Speicher aus und sendet keine Eingaben ans Spiel. Eine Garantie des Spieleherstellers gibt es trotzdem nicht.</p></details>
+  <details><summary>Brauche ich Internet oder einen Account?</summary><p>Nein. Die Erkennung läuft per Bildvergleich auf deinem PC. Internet wird nur genutzt, um die aktuelle Meta-Tier-Liste zu laden.</p></details>
+  <details><summary>Warum heißt es „Steam-Screenshot“?</summary><p>Die App nutzt den Screenshot-Ordner von Steam. Wenn du in Steam eine andere Screenshot-Taste eingestellt hast, nimm einfach die.</p></details>
+  <details><summary>Ein Held wird falsch erkannt – was tun?</summary><p>Auf der Karte mit ✎ den richtigen Helden wählen. Die App merkt sich das Porträt und erkennt es beim nächsten Mal. Im Tab „Anlernen“ kannst du auch mehrere alte Screenshots auf einmal durchgehen.</p></details>
+  <details><summary>Windows warnt beim Installieren („Unbekannter Herausgeber“)</summary><p>Das liegt daran, dass die Setup-Datei (noch) nicht digital signiert ist. Mit „Weitere Informationen“ → „Trotzdem ausführen“ startest du die Installation.</p></details>
+</div></section>
+
+<section id="download"><div class="wrap">
+  <div class="dl">
+    <div>
+      <h2>Rivals Counter-Picker für Windows</h2>
+      <div class="small" id="ver">Neueste Version</div>
+      <ul><li>Windows 10 oder 11 (64 Bit), Marvel Rivals über Steam</li><li>Im Spiel „Randloses Fenster“ empfohlen</li><li>Daten bleiben lokal auf deinem PC</li></ul>
+    </div>
+    <a class="btn" id="dlbtn2" href="#">⬇ Setup herunterladen</a>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="row">
+    <span>© <span id="yr"></span> Rivals Counter-Picker · Fan-Projekt</span>
+    <span><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></span>
+  </div>
+  <p>Inoffizielles Fan-Tool. Nicht verbunden mit, unterstützt oder gesponsert von NetEase Games oder Marvel. Marvel Rivals und alle zugehörigen Namen sind Marken ihrer jeweiligen Inhaber. Statistiken: counterwatch.gg, rivalstracker.com.</p>
+</div></footer>
+
+<script>
+// Download-Link automatisch aus der GitHub-Pages-Adresse ableiten: https://NAME.github.io/REPO/ → github.com/NAME/REPO/releases/latest
+(function () {
+  document.getElementById("yr").textContent = new Date().getFullYear();
+  const host = location.hostname, seg = location.pathname.split("/").filter(Boolean)[0];
+  let repo = null;
+  if (host.endsWith(".github.io") && seg) repo = host.split(".")[0] + "/" + seg;
+  const url = repo ? `https://github.com/${repo}/releases/latest` : "#download";
+  ["dlbtn", "dlbtn2"].forEach(id => { const a = document.getElementById(id); if (a) a.href = url; });
+  if (!repo) return;
+  fetch(`https://api.github.com/repos/${repo}/releases/latest`).then(r => r.ok ? r.json() : null).then(rel => {
+    if (!rel) return;
+    const exe = (rel.assets || []).find(a => /\.exe$/i.test(a.name));
+    if (exe) ["dlbtn", "dlbtn2"].forEach(id => { const a = document.getElementById(id); if (a) a.href = exe.browser_download_url; });
+    document.getElementById("ver").textContent = `Version ${rel.tag_name} · ${new Date(rel.published_at).toLocaleDateString("de-DE")}`;
+  }).catch(() => {});
+})();
+</script>
+</body>
+</html>
